@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰拉瑞亚1.4.5世界种子生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(30, 41, 59, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border: 1px solid #4a5568;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4a5568;
+        }
+        
+        h1 {
+            color: #38b2ac;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .control-panel {
+            background-color: rgba(26, 32, 44, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #4a5568;
+        }
+        
+        .seed-panel {
+            background-color: rgba(26, 32, 44, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #4a5568;
+        }
+        
+        .section-title {
+            color: #68d391;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4a5568;
+        }
+        
+        .option-group {
+            margin-bottom: 25px;
+        }
+        
+        .option-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e0;
+            font-weight: 600;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #38b2ac;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            padding: 10px;
+            background-color: rgba(45, 55, 72, 0.5);
+            border-radius: 6px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .checkbox-item label {
+            color: #e2e8f0;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .checkbox-item .unknown-seed {
+            color: #e2a358;
+            font-style: italic;
+        }
+        
+        .checkbox-item .platform-limited {
+            color: #ed8936;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        }
+        
+        button.secondary:hover {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        }
+        
+        .result-area {
+            margin-top: 25px;
+        }
+        
+        .result-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #68d391;
+            font-weight: 600;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: vertical;
+        }
+        
+        .copy-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #4c51bf;
+            width: 100%;
+        }
+        
+        .copy-btn:hover {
+            background-color: #434190;
+        }
+        
+        .info-box {
+            background-color: rgba(56, 178, 172, 0.1);
+            border-left: 4px solid #38b2ac;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .info-box h4 {
+            color: #38b2ac;
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #4a5568;
+        }
+        
+        .seed-example {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #2d3748;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #cbd5e0;
+        }
+        
+        .flag-zenith {
+            background-color: rgba(104, 211, 145, 0.1);
+            border: 1px solid #68d391;
+        }
+        
+        .flag-zenith label {
+            color: #68d391 !important;
+            font-weight: bold;
+        }
+        
+        .flag-skylands {
+            background-color: rgba(237, 137, 54, 0.1);
+            border: 1px solid #ed8936;
+        }
+        
+        .flag-skylands label {
+            color: #ed8936 !important;
+            font-weight: bold;
+        }
+        
+        .disabled-checkbox {
+            opacity: 0.6;
+        }
+        
+        .disabled-checkbox label {
+            color: #a0aec0 !important;
+        }
+        
+        .zenith-included {
+            background-color: rgba(104, 211, 145, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>泰拉瑞亚 1.4.5 世界种子生成器</h1>
+            <p class="subtitle">快速生成自定义世界种子组合，支持多世界效果选择</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="control-panel">
+                <h2 class="section-title">世界基本参数</h2>
+                
+                <div class="option-group">
+                    <label class="option-label">世界大小</label>
+                    <select id="worldSize">
+                        <option value="1">小世界 (1)</option>
+                        <option value="2" selected>中世界 (2)</option>
+                        <option value="3">大世界 (3)</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">世界难度</label>
+                    <select id="worldDifficulty">
+                        <option value="1">经典模式 (1)</option>
+                        <option value="2" selected>专家模式 (2)</option>
+                        <option value="3">大师模式 (3)</option>
+                        <option value="4">旅途模式 (4)</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">邪恶种类</label>
+                    <select id="evilType">
+                        <option value="1">腐化 (1)</option>
+                        <option value="2" selected>血腥 (2)</option>
+                    </select>
+                </div>
+                
+                <h2 class="section-title">特殊世界标志</h2>
+                
+                <div class="option-group">
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="flag0" value="0" checked>
+                            <label for="flag0">正常世界 (0)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag1" value="1">
+                            <label for="flag1">醉酒世界 (1)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag2" value="2">
+                            <label for="flag2">不要蜜蜂世界 (2)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag4" value="4">
+                            <label for="flag4">勇者世界 (4)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag8" value="8">
+                            <label for="flag8">十周年庆典世界 (8)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag16" value="16">
+                            <label for="flag16">饥荒联动世界 (16)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag32" value="32">
+                            <label for="flag32">颠倒世界 (32)</label>
+                        </div>
+                        <div class="checkbox-item zenith-included">
+                            <input type="checkbox" id="flag64" value="64">
+                            <label for="flag64">无机关世界 (64)</label>
+                        </div>
+                        <div class="checkbox-item flag-zenith">
+                            <input type="checkbox" id="flag255" value="255">
+                            <label for="flag255">天顶世界 (255) - 包含所有1-127选项</label>
+                        </div>
+                        <div class="checkbox-item flag-skylands">
+                            <input type="checkbox" id="flag256" value="256">
+                            <label for="flag256">空岛世界 (256)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">世界效果（秘密种子）</h2>
+                
+                <div class="option-group">
+                    <label class="option-label">选择世界效果（可多选）</label>
+                    <div class="checkbox-group" id="worldEffects">
+                        <!-- 这里通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="generateBtn">生成世界种子</button>
+                    <button id="randomizeBtn" class="secondary">随机生成</button>
+                    <button id="resetBtn" class="secondary">重置</button>
+                </div>
+            </div>
+            
+            <div class="seed-panel">
+                <h2 class="section-title">生成的种子</h2>
+                
+                <div class="result-area">
+                    <label class="result-label">种子字符串</label>
+                    <textarea id="seedOutput" readonly placeholder="生成的种子将显示在这里..."></textarea>
+                    <button id="copyBtn" class="copy-btn">复制到剪贴板</button>
+                </div>
+                
+                <div class="info-box">
+                    <h4>种子格式说明</h4>
+                    <p>种子格式：<code>世界大小.难度.邪恶.特殊标志.秘密种子|...|随机数</code></p>
+                    <p>示例：<code>2.4.2.0.iamerror|xray vision|jagged rocks|833544688</code></p>
+                    <div class="seed-example">
+                        2 - 中世界<br>
+                        4 - 专家模式<br>
+                        2 - 血腥<br>
+                        0 - 正常世界<br>
+                        iamerror - 错误世界种子<br>
+                        xray vision - 全亮世界种子<br>
+                        jagged rocks - 崎岖岩石种子<br>
+                        833544688 - 随机数
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>特殊标志计算规则</h4>
+                    <p>特殊标志是所选值的总和：</p>
+                    <ul style="padding-left: 20px; margin-top: 5px;">
+                        <li>正常世界 (0) 与其他选项互斥</li>
+                        <li>天顶世界 (255) = 所有1-127选项之和</li>
+                        <li>选择天顶世界会自动勾选所有1-127选项</li>
+                        <li>手动勾选所有1-127选项不会自动选择天顶世界</li>
+                        <li>天顶+空岛 = 511 (255+256)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>泰拉瑞亚世界种子生成器 v1.2 | 基于1.4.5版本 | 数据来自官方Wiki</p>
+            <p>此工具完全免费，可用于个人非商业用途</p>
+        </footer>
+    </div>
+
+    <script>
+        // 世界效果数据（包含已揭示和未揭示的种子）
+        const worldEffectsData = [
+            { id: 1, name: "画面黑白化（涂上灰色油漆）", seed: "monochrome", revealed: true },
+            { id: 2, name: "画面负片化", seed: "negative infinity", revealed: true },
+            { id: 3, name: "隐形世界（涂上回声涂层）", seed: "invisible plane", revealed: true },
+            { id: 4, name: "全亮世界/透视（涂上夜明涂层）", seed: "xray vision", revealed: true },
+            { id: 5, name: "无地表", seed: "mole people", revealed: true },
+            { id: 6, name: "更多生命树", seed: "save the rainforest", revealed: true },
+            { id: 7, name: "更多浮空岛", seed: "the carebears movie", revealed: true },
+            { id: 8, name: "错误世界（很多生成错误）", seed: "i am error", revealed: true },
+            { id: 9, name: "活死人之夜（开局墓地+血月）", seed: "night of the living dead", revealed: true },
+            { id: 10, name: "太空高度地表（低重力/缺氧）", seed: "such great heights", revealed: true },
+            { id: 11, name: "永恒之雨（全年下雨）", seed: "bring a towel", revealed: true },
+            { id: 12, name: "更大的废弃房屋", seed: "abandoned manors", revealed: true },
+            { id: 13, name: "随机出生点", seed: "how did i get here", revealed: true },
+            { id: 14, name: "添加传送机", seed: "beam me up", revealed: true },
+            { id: 15, name: "困难模式开局", seed: "too easy", revealed: true },
+            { id: 16, name: "无感染模式（无腐化/猩红）", seed: "fishmox", revealed: true },
+            { id: 17, name: "地表神圣", seed: "（尚未揭示）", revealed: false },
+            { id: 18, name: "感染世界", seed: "（尚未揭示）", revealed: false },
+            { id: 19, name: "蘑菇世界（地表是蘑菇生物群落）", seed: "toadstool", revealed: true },
+            { id: 20, name: "全沙漠地表", seed: "（尚未揭示）", revealed: false },
+            { id: 21, name: "便便世界（Poo Everywhere）", seed: "truck stop", revealed: true },
+            { id: 22, name: "蜘蛛恐惧症（无蜘蛛洞？）", seed: "arachnophobia", revealed: true },
+            { id: 23, name: "更多陷阱（实际上没有？）", seed: "more traps please", revealed: true },
+            { id: 24, name: "彩虹之路（彩虹物品/方块）", seed: "rainbow road", revealed: true },
+            { id: 25, name: "崎岖岩石（更大更易洞穴）", seed: "jagged rocks", revealed: true },
+            { id: 26, name: "小行星（世界由多个球组成）", seed: "planetoids", revealed: true },
+            { id: 27, name: "水上乐园（更多液体）", seed: "waterpark", revealed: true },
+            { id: 28, name: "箱子内有传送枪", seed: "（尚未揭示）", revealed: false },
+            { id: 29, name: "凛冬将至（世界被雪覆盖）", seed: "winter is coming", revealed: true },
+            { id: 30, name: "南瓜季（万圣节生成）", seed: "pumpkin season", revealed: true },
+            { id: 31, name: "无尽五号节", seed: "hocus pocus", revealed: true },
+            { id: 32, name: "无尽圣诞节", seed: "jingle all the way", revealed: true },
+            { id: 33, name: "恶魔城诅咒（吸血鬼机制）", seed: "what a horrible night to have a curse", revealed: true },
+            { id: 34, name: "大逃杀/团队出生点", seed: "royale with cheese", revealed: true },
+            { id: 35, name: "双地牢（仅限主机/移动端）", seed: "dual dungeons", revealed: true, platform: "mobile/console" }
+        ];
+
+        // 定义包含在天顶世界中的标志（1-127）
+        const zenithIncludedFlags = [1, 2, 4, 8, 16, 32, 64];
+        
+        // 状态管理
+        let isZenithSelected = false;
+        let isUserInteracting = false;
+
+        // DOM元素
+        const worldEffectsContainer = document.getElementById('worldEffects');
+        const worldSizeSelect = document.getElementById('worldSize');
+        const worldDifficultySelect = document.getElementById('worldDifficulty');
+        const evilTypeSelect = document.getElementById('evilType');
+        const seedOutput = document.getElementById('seedOutput');
+        const generateBtn = document.getElementById('generateBtn');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        
+        // 特殊标志复选框
+        const flagCheckboxes = [
+            document.getElementById('flag0'),
+            document.getElementById('flag1'),
+            document.getElementById('flag2'),
+            document.getElementById('flag4'),
+            document.getElementById('flag8'),
+            document.getElementById('flag16'),
+            document.getElementById('flag32'),
+            document.getElementById('flag64'),
+            document.getElementById('flag255'),
+            document.getElementById('flag256')
+        ];
+
+        // 初始化世界效果复选框
+        function initializeWorldEffects() {
+            worldEffectsData.forEach(effect => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                
+                const checkboxId = `effect${effect.id}`;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = checkboxId;
+                checkbox.value = effect.seed;
+                
+                // 如果种子未揭示，禁用复选框
+                if (!effect.revealed) {
+                    checkbox.disabled = true;
+                }
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkboxId;
+                
+                // 构建显示文本
+                let labelText = `${effect.id}. ${effect.name}`;
+                if (effect.revealed) {
+                    labelText += ` (${effect.seed})`;
+                } else {
+                    labelText += ` (${effect.seed})`;
+                    label.classList.add('unknown-seed');
+                }
+                
+                // 添加平台限制标注
+                if (effect.platform) {
+                    labelText += ` [${effect.platform}]`;
+                    label.classList.add('platform-limited');
+                }
+                
+                label.textContent = labelText;
+                
+                checkboxItem.appendChild(checkbox);
+                checkboxItem.appendChild(label);
+                worldEffectsContainer.appendChild(checkboxItem);
+            });
+        }
+
+        // 获取选中的世界效果
+        function getSelectedWorldEffects() {
+            const selectedEffects = [];
+            const checkboxes = worldEffectsContainer.querySelectorAll('input[type="checkbox"]:checked');
+            
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.disabled) {
+                    selectedEffects.push(checkbox.value);
+                }
+            });
+            
+            return selectedEffects;
+        }
+
+        // 当选择天顶世界时，自动选择包含在其中的标志
+        function selectZenithIncludedFlags() {
+            isUserInteracting = true;
+            
+            // 选择天顶世界时，自动勾选所有1-127的选项
+            zenithIncludedFlags.forEach(flagValue => {
+                const checkbox = document.getElementById(`flag${flagValue}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    checkbox.disabled = true; // 禁用这些复选框
+                    checkbox.parentElement.classList.add('disabled-checkbox');
+                }
+            });
+            
+            // 确保正常世界未选中
+            document.getElementById('flag0').checked = false;
+            
+            isUserInteracting = false;
+            isZenithSelected = true;
+        }
+
+        // 当取消天顶世界时，取消所有天顶包含的标志
+        function deselectZenithIncludedFlags() {
+            isUserInteracting = true;
+            
+            // 取消选择天顶世界时，取消勾选所有1-127的选项
+            zenithIncludedFlags.forEach(flagValue => {
+                const checkbox = document.getElementById(`flag${flagValue}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                    checkbox.disabled = false; // 启用这些复选框
+                    checkbox.parentElement.classList.remove('disabled-checkbox');
+                }
+            });
+            
+            isUserInteracting = false;
+            isZenithSelected = false;
+        }
+
+        // 计算特殊标志值
+        function calculateSpecialFlag() {
+            let flagValue = 0;
+            let hasNormalWorld = false;
+            let hasZenith = false;
+            let hasSkylands = false;
+            
+            // 检查特殊复选框
+            flagCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const value = parseInt(checkbox.value);
+                    
+                    if (value === 0) {
+                        hasNormalWorld = true;
+                    } else if (value === 255) {
+                        hasZenith = true;
+                    } else if (value === 256) {
+                        hasSkylands = true;
+                    }
+                    
+                    flagValue += value;
+                }
+            });
+            
+            // 处理特殊规则
+            if (hasNormalWorld && flagValue > 0) {
+                // 正常世界与其他选项互斥，如果选了其他选项，清除正常世界
+                flagValue = 0;
+                flagCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked && parseInt(checkbox.value) !== 0) {
+                        flagValue += parseInt(checkbox.value);
+                    }
+                });
+            }
+            
+            // 如果有天顶世界，直接返回255（或加上空岛的511）
+            if (hasZenith) {
+                return hasSkylands ? 511 : 255;
+            }
+            
+            return flagValue;
+        }
+
+        // 生成随机数（9-10位）
+        function generateRandomNumber() {
+            // 生成9位或10位随机数
+            const isTenDigit = Math.random() > 0.5;
+            const min = isTenDigit ? 1000000000 : 100000000;
+            const max = isTenDigit ? 9999999999 : 999999999;
+            
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // 生成种子字符串
+        function generateSeedString() {
+            const worldSize = worldSizeSelect.value;
+            const worldDifficulty = worldDifficultySelect.value;
+            const evilType = evilTypeSelect.value;
+            const specialFlag = calculateSpecialFlag();
+            
+            const selectedEffects = getSelectedWorldEffects();
+            const randomNumber = generateRandomNumber();
+            
+            // 构建种子字符串
+            let seedString = `${worldSize}.${worldDifficulty}.${evilType}.${specialFlag}`;
+            
+            if (selectedEffects.length > 0) {
+                // 过滤掉"尚未揭示"的种子
+                const validEffects = selectedEffects.filter(effect => !effect.includes('尚未揭示'));
+                if (validEffects.length > 0) {
+                    seedString += `.${validEffects.join('|')}|${randomNumber}`;
+                } else {
+                    seedString += `.${randomNumber}`;
+                }
+            } else {
+                seedString += `.${randomNumber}`;
+            }
+            
+            return seedString;
+        }
+
+        // 随机选择世界效果
+        function randomizeSelection() {
+            // 随机选择世界大小、难度、邪恶种类
+            worldSizeSelect.selectedIndex = Math.floor(Math.random() * 3);
+            worldDifficultySelect.selectedIndex = Math.floor(Math.random() * 4);
+            evilTypeSelect.selectedIndex = Math.floor(Math.random() * 2);
+            
+            // 随机选择特殊标志
+            flagCheckboxes.forEach(checkbox => {
+                checkbox.checked = Math.random() > 0.7;
+                checkbox.disabled = false; // 先启用所有
+                checkbox.parentElement.classList.remove('disabled-checkbox');
+            });
+            
+            // 处理天顶世界逻辑
+            if (document.getElementById('flag255').checked) {
+                isZenithSelected = true;
+                selectZenithIncludedFlags();
+            } else {
+                isZenithSelected = false;
+            }
+            
+            // 确保正常世界与其他选项的逻辑
+            if (document.getElementById('flag0').checked) {
+                // 如果选了正常世界，清除其他选项
+                flagCheckboxes.forEach(checkbox => {
+                    if (parseInt(checkbox.value) !== 0) {
+                        checkbox.checked = false;
+                    }
+                });
+                isZenithSelected = false;
+            }
+            
+            // 随机选择世界效果（只选择已揭示的）
+            const effectCheckboxes = worldEffectsContainer.querySelectorAll('input[type="checkbox"]');
+            effectCheckboxes.forEach(checkbox => {
+                if (!checkbox.disabled) { // 只对已启用的进行操作
+                    checkbox.checked = Math.random() > 0.8;
+                }
+            });
+            
+            // 生成种子
+            const seedString = generateSeedString();
+            seedOutput.value = seedString;
+        }
+
+        // 重置所有选项
+        function resetAll() {
+            // 重置基本参数
+            worldSizeSelect.selectedIndex = 1;
+            worldDifficultySelect.selectedIndex = 1;
+            evilTypeSelect.selectedIndex = 1;
+            
+            // 重置特殊标志
+            flagCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                checkbox.disabled = false; // 启用所有复选框
+                checkbox.parentElement.classList.remove('disabled-checkbox');
+            });
+            document.getElementById('flag0').checked = true;
+            
+            // 重置天顶状态
+            isZenithSelected = false;
+            
+            // 重置世界效果
+            const effectCheckboxes = worldEffectsContainer.querySelectorAll('input[type="checkbox"]');
+            effectCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                // 启用所有复选框（已揭示的）
+                checkbox.disabled = checkbox.value.includes('尚未揭示');
+            });
+            
+            // 清空输出
+            seedOutput.value = '';
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const seedText = seedOutput.value;
+            
+            if (!seedText) {
+                alert('请先生成种子！');
+                return;
+            }
+            
+            navigator.clipboard.writeText(seedText)
+                .then(() => {
+                    // 显示复制成功提示
+                    copyBtn.textContent = '已复制！';
+                    setTimeout(() => {
+                        copyBtn.textContent = '复制到剪贴板';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('复制失败:', err);
+                    alert('复制失败，请手动复制种子文本');
+                });
+        }
+
+        // 处理天顶包含标志的变化
+        function handleZenithIncludedFlagChange() {
+            if (isUserInteracting) return;
+            
+            // 检查是否所有天顶包含的标志都被选中
+            let allSelected = true;
+            zenithIncludedFlags.forEach(flagValue => {
+                const checkbox = document.getElementById(`flag${flagValue}`);
+                if (checkbox && !checkbox.checked) {
+                    allSelected = false;
+                }
+            });
+            
+            // 如果所有天顶包含的标志都被选中，且当前没有选择天顶，询问用户是否要选择天顶
+            
+        }
+
+        // 处理特殊标志的互斥逻辑
+        function setupSpecialFlagLogic() {
+            // 天顶世界复选框的事件处理
+            document.getElementById('flag255').addEventListener('change', function() {
+                if (isUserInteracting) return;
+                
+                if (this.checked) {
+                    selectZenithIncludedFlags();
+                } else {
+                    deselectZenithIncludedFlags();
+                }
+            });
+            
+            // 正常世界复选框的事件处理
+            document.getElementById('flag0').addEventListener('change', function() {
+                if (isUserInteracting) return;
+                
+                if (this.checked) {
+                    // 如果选择了正常世界，清除其他所有选项
+                    isUserInteracting = true;
+                    flagCheckboxes.forEach(cb => {
+                        if (parseInt(cb.value) !== 0) {
+                            cb.checked = false;
+                            cb.disabled = false; // 启用所有复选框
+                            cb.parentElement.classList.remove('disabled-checkbox');
+                        }
+                    });
+                    // 清除天顶状态
+                    document.getElementById('flag255').checked = false;
+                    isZenithSelected = false;
+                    isUserInteracting = false;
+                }
+            });
+            
+            // 其他选项的事件处理
+            flagCheckboxes.forEach(checkbox => {
+                const value = parseInt(checkbox.value);
+                
+                // 跳过天顶世界和正常世界，因为我们已经单独处理了它们
+                if (value === 0 || value === 255 || value === 256) return;
+                
+                checkbox.addEventListener('change', function() {
+                    if (isUserInteracting) return;
+                    
+                    // 如果选择了其他选项，清除正常世界
+                    if (this.checked) {
+                        document.getElementById('flag0').checked = false;
+                    }
+                    
+                    // 如果选择了天顶包含的标志，检查是否需要提示选择天顶
+                    if (zenithIncludedFlags.includes(value)) {
+                        handleZenithIncludedFlagChange();
+                    }
+                });
+            });
+            
+            // 空岛世界的事件处理
+            document.getElementById('flag256').addEventListener('change', function() {
+                if (isUserInteracting) return;
+                
+                // 如果选择了空岛世界，清除正常世界
+                if (this.checked) {
+                    document.getElementById('flag0').checked = false;
+                }
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化世界效果列表
+            initializeWorldEffects();
+            
+            // 设置特殊标志的逻辑
+            setupSpecialFlagLogic();
+            
+            // 设置按钮事件
+            generateBtn.addEventListener('click', function() {
+                const seedString = generateSeedString();
+                seedOutput.value = seedString;
+            });
+            
+            randomizeBtn.addEventListener('click', randomizeSelection);
+            resetBtn.addEventListener('click', resetAll);
+            copyBtn.addEventListener('click', copyToClipboard);
+            
+            // 页面加载时生成一个示例种子
+            setTimeout(() => {
+                const exampleSeed = "2.4.2.0.iamerror|xray vision|jagged rocks|833544688";
+                seedOutput.value = "点击'生成世界种子'按钮生成种子\n\n示例种子:\n" + exampleSeed;
+            }, 500);
+        });
+    </script>
+</body>
+</html>
