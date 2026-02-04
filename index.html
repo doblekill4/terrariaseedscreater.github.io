@@ -558,27 +558,29 @@
             
             return selectedEffects;
         }
+        
         // 双地牢选项互斥逻辑
-function setupDungeonMutualExclusion() {
-    const pcDungeonCheckbox = document.getElementById('effect35');
-    const consoleDungeonCheckbox = document.getElementById('effect36');
-    
-    if (!pcDungeonCheckbox || !consoleDungeonCheckbox) return;
-    
-    // PC双地牢事件处理
-    pcDungeonCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            consoleDungeonCheckbox.checked = false;
+        function setupDungeonMutualExclusion() {
+            const pcDungeonCheckbox = document.getElementById('effect35');
+            const consoleDungeonCheckbox = document.getElementById('effect36');
+            
+            if (!pcDungeonCheckbox || !consoleDungeonCheckbox) return;
+            
+            // PC双地牢事件处理
+            pcDungeonCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    consoleDungeonCheckbox.checked = false;
+                }
+            });
+            
+            // 主机/移动双地牢事件处理
+            consoleDungeonCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    pcDungeonCheckbox.checked = false;
+                }
+            });
         }
-    });
-    
-    // 主机/移动双地牢事件处理
-    consoleDungeonCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            pcDungeonCheckbox.checked = false;
-        }
-    });
-}
+        
         // 当选择天顶世界时，自动选择包含在其中的标志
         function selectZenithIncludedFlags() {
             isUserInteracting = true;
@@ -889,6 +891,9 @@ function setupDungeonMutualExclusion() {
             
             // 设置特殊标志的逻辑
             setupSpecialFlagLogic();
+            
+            // 设置双地牢互斥逻辑
+            setupDungeonMutualExclusion();
             
             // 设置按钮事件
             generateBtn.addEventListener('click', function() {
