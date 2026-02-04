@@ -466,7 +466,8 @@
             { id: 32, name: "无尽圣诞节", seed: "jingle all the way", revealed: true },
             { id: 33, name: "恶魔城诅咒（吸血鬼机制）", seed: "what a horrible night to have a curse", revealed: true },
             { id: 34, name: "大逃杀/团队出生点", seed: "royale with cheese", revealed: true },
-            { id: 35, name: "双地牢（仅限主机/移动端）", seed: "dual dungeons", revealed: true, platform: "mobile/console" }
+            { id: 35, name: "双地牢（PC版）", seed: "double daring dangers", revealed: true },
+            { id: 36, name: "双地牢（主机/移动版）", seed: "dual dungeons", revealed: true, platform: "mobile/console" },
         ];
 
         // 定义包含在天顶世界中的标志（1-127）
@@ -557,7 +558,27 @@
             
             return selectedEffects;
         }
-
+        // 双地牢选项互斥逻辑
+function setupDungeonMutualExclusion() {
+    const pcDungeonCheckbox = document.getElementById('effect35');
+    const consoleDungeonCheckbox = document.getElementById('effect36');
+    
+    if (!pcDungeonCheckbox || !consoleDungeonCheckbox) return;
+    
+    // PC双地牢事件处理
+    pcDungeonCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            consoleDungeonCheckbox.checked = false;
+        }
+    });
+    
+    // 主机/移动双地牢事件处理
+    consoleDungeonCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            pcDungeonCheckbox.checked = false;
+        }
+    });
+}
         // 当选择天顶世界时，自动选择包含在其中的标志
         function selectZenithIncludedFlags() {
             isUserInteracting = true;
