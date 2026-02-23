@@ -448,7 +448,7 @@
             { id: 14, name: "添加传送机", seed: "beam me up", revealed: true },
             { id: 15, name: "困难模式开局", seed: "too easy", revealed: true },
             { id: 16, name: "无感染模式（无腐化/猩红）", seed: "fishmox", revealed: true },
-            { id: 17, name: "地表神圣", seed: "does that sparkle", revealed: false },
+            { id: 17, name: "地表神圣", seed: "does that sparkle", revealed: true },
             { id: 18, name: "感染世界", seed: "purify this", revealed: true },
             { id: 19, name: "蘑菇世界（地表是蘑菇生物群落）", seed: "toadstool", revealed: true },
             { id: 20, name: "全沙漠地表", seed: "sandy britches", revealed: true },
@@ -459,7 +459,7 @@
             { id: 25, name: "崎岖岩石（更大更易洞穴）", seed: "jagged rocks", revealed: true },
             { id: 26, name: "小行星（世界由多个球组成）", seed: "planetoids", revealed: true },
             { id: 27, name: "水上乐园（更多液体）", seed: "waterpark", revealed: true },
-            { id: 28, name: "箱子内有传送枪", seed: "we don't even test for that", revealed: false },
+            { id: 28, name: "箱子内有传送枪", seed: "we don't even test for that", revealed: true },
             { id: 29, name: "凛冬将至（世界被雪覆盖）", seed: "winter is coming", revealed: true },
             { id: 30, name: "南瓜季（万圣节生成）", seed: "pumpkin season", revealed: true },
             { id: 31, name: "无尽五号节", seed: "hocus pocus", revealed: true },
@@ -517,6 +517,8 @@
                 // 如果种子未揭示，禁用复选框
                 if (!effect.revealed) {
                     checkbox.disabled = true;
+                    // 修复：添加正确的禁用样式类名
+                    checkboxItem.classList.add('disabled-checkbox');
                 }
                 
                 const label = document.createElement('label');
@@ -527,7 +529,7 @@
                 if (effect.revealed) {
                     labelText += ` (${effect.seed})`;
                 } else {
-                    labelText += ` (${effect.seed})`;
+                    labelText += ` (${effect.seed}) [尚未揭示]`;
                 }
                 
                 // 添加平台限制标注
@@ -746,7 +748,7 @@
             seedOutput.value = seedString;
         }
 
-        // 重置所有选项
+        // 修复重置函数中的禁用逻辑
         function resetAll() {
             // 重置基本参数
             worldSizeSelect.selectedIndex = 1;
@@ -756,7 +758,7 @@
             // 重置特殊标志
             flagCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
-                checkbox.disabled = false; // 启用所有复选框
+                checkbox.disabled = false;
                 checkbox.parentElement.classList.remove('disabled-checkbox');
             });
             document.getElementById('flag0').checked = true;
@@ -768,8 +770,20 @@
             const effectCheckboxes = worldEffectsContainer.querySelectorAll('input[type="checkbox"]');
             effectCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
-                // 启用所有复选框（已揭示的）
-                checkbox.disabled = checkbox.value.includes('尚未揭示');
+                // 修复：根据 revealed 状态设置 disabled
+                const effectId = parseInt(checkbox.id.replace('effect', ''));
+                const effect = worldEffectsData.find(e => e.id === effectId);
+                checkbox.disabled = effect ? !effect.revealed : false;
+                
+                // 修复：根据 disabled 状态添加/移除禁用样式类
+                const parentItem = checkbox.closest('.checkbox-item');
+                if (parentItem) {
+                    if (checkbox.disabled) {
+                        parentItem.classList.add('disabled-checkbox');
+                    } else {
+                        parentItem.classList.remove('disabled-checkbox');
+                    }
+                }
             });
             
             // 清空输出
